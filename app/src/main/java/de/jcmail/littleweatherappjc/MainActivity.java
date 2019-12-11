@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
                 if (newCity != null) {
                     getWeatherForNewCity(newCity);
                 } else {
-                    Log.d(LOG, "Getting the weather for the current location");
                     getWeatherForLocation();
                 }
 
@@ -148,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        Log.d(LOG, "onResume() callback called");
-        Log.d(LOG, "Getting the weather from the location");
-
         getWeatherForLocation();
     }//onResume callback
 
@@ -165,20 +161,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onLocationChanged(Location location) {
 
-                Log.d(LOG, "onProviderChanged() callback received");
-
                 //getting the location and logging the result
                 String longitude = String.valueOf(location.getLongitude());
                 String latitude = String.valueOf(location.getLatitude());
-                Log.d(LOG, "Longitude is: " + longitude);
-                Log.d(LOG, "Latitude is: " + latitude);
 
                 RequestParams myParams = new RequestParams();
                 myParams.put("lang", LANGUAGE);
                 myParams.put("lat", latitude);
                 myParams.put("lon", longitude);
                 myParams.put("appid", APP_ID);
-                Log.d(LOG, "myParams contains: " + myParams.toString());
 
                 myNetworkingMethod(myParams);
             }// onLocationChanged
@@ -222,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         myParams.put("q", city);
         myParams.put("lang", LANGUAGE);
         myParams.put("appid", APP_ID);
-        Log.d(LOG, "myParams contains: " + myParams.toString());
 
         myNetworkingMethod(myParams);
 
@@ -255,10 +245,7 @@ public class MainActivity extends AppCompatActivity {
         myClient.get(WEATHER_URL, myParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int status, Header[] headers, JSONObject response) {
-                //logging the json response to the screan
-                Log.d(LOG, "Success! JSON: " + response.toString());
 
-                //decding the information from the json
                 processJson(response);
             }//onSuccess
 
@@ -279,15 +266,12 @@ public class MainActivity extends AppCompatActivity {
         try {
             //getting the city's name
             myCity = jsonObject.getString("name");
-            Log.d(LOG, "City: " + myCity);
             locationTextView.setText(myCity);
 
             // accessing temperature value and converting Kelvin to Celsius
             double myTempResult = jsonObject.getJSONObject("main").getDouble("temp") - 273.15;
             //converting result to integer
             int myRoundedTemp = (int) Math.rint(myTempResult);
-            Log.d(LOG, "Temperature in Celsius: " + myRoundedTemp);
-
             tempTextView.setText(String.valueOf(myRoundedTemp));
 
             //getting the weather's description
