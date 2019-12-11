@@ -56,7 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="&#176; C"
+        android:text="@string/temperatureUnitLabel"
         android:textSize="32sp"
         app:layout_constraintStart_toEndOf="@+id/tempTextView"
         app:layout_constraintTop_toTopOf="@+id/tempTextView" />
@@ -67,7 +67,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="44dp"
         android:ems="10"
-        android:hint="Augsburg, Muenchen ..."
+        android:hint="@string/editText_hint"
         android:lines="1"
         android:maxLines="1"
         android:singleLine="true"
@@ -81,7 +81,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="44dp"
-        android:text="Current Location"
+        android:text="@string/getCurrentLocationLabel"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -102,11 +102,11 @@
         android:id="@+id/editLabelTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Find a City:"
-        android:textSize="14sp"
+        android:text="@string/editText_label"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/editCityName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.488"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

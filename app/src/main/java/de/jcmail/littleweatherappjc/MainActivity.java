@@ -1,6 +1,7 @@
 package de.jcmail.littleweatherappjc;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -8,6 +9,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -85,12 +88,33 @@ public class MainActivity extends AppCompatActivity {
         locationTextView = findViewById(R.id.locationTextView);
         tempTextView = findViewById(R.id.tempTextView);
         weatherDescritptionTextView = findViewById(R.id.weatherDescriptionTextView);
-
         editCityField = findViewById(R.id.editCityName);
-          getCurrentLocationBtn = findViewById(R.id.getCurrentLocationBtn);
+        getCurrentLocationBtn = findViewById(R.id.getCurrentLocationBtn);
 
-        //update the date
+        //getting the current date and updating the textfield
         dateView.setText(getCurrentDate());
+
+        //wiring the textfield to the app
+        editCityField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                String newCity = editCityField.getText().toString();
+
+                if (newCity != null) {
+                    getWeatherForNewCity(newCity);
+                } else {
+                    Log.d(LOG, "Getting the weather for the current location");
+                    getWeatherForLocation();
+                }
+
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+
+                return false;
+            }
+        });//setOnEditorActionListener
+
 
     }
 
@@ -127,28 +151,22 @@ public class MainActivity extends AppCompatActivity {
                 myParams.put("lat", latitude);
                 myParams.put("lon", longitude);
                 myParams.put("appid", APP_ID);
-
                 Log.d(LOG, "myParams contains: " + myParams.toString());
 
                 myNetworkingMethod(myParams);
             }// onLocationChanged
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
+            public void onStatusChanged(String provider, int status, Bundle extras) {}
 
             @Override
-            public void onProviderEnabled(String provider) {
-
-            }
+            public void onProviderEnabled(String provider) {}
 
             @Override
             public void onProviderDisabled(String provider) {
-
                 Log.d(LOG, "onProviderDisabled() callback received");
             }
-        };//getWeatherForLocation
+        };//LocationListener
 
         //setting up the location manager
         myLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -173,8 +191,22 @@ public class MainActivity extends AppCompatActivity {
         }
         myLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, myLocationListener);
 
-    }
+    }//getWeatherForLocation
 
+    //getting the weather-info based on custom textfield-data
+    private void getWeatherForNewCity(String city) {
+
+        RequestParams myParams = new RequestParams();
+        myParams.put("q", city);
+        myParams.put("lang", LANGUAGE);
+        myParams.put("appid", APP_ID);
+        Log.d(LOG, "myParams contains: " + myParams.toString());
+
+        myNetworkingMethod(myParams);
+
+    }//getWeatherForNewCity
+
+    //get the user"s permission to acces the location data
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -214,9 +246,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.e(LOG, e.toString());
                 Log.d(LOG, "Statuscode: " + statusCode);
 
+                //displaying an error toast when no network connection is available
                 Toast.makeText(MainActivity.this, "The HTTP-Request failed", Toast.LENGTH_SHORT).show();
             }//onFailure
-
 
         });//myClient.get
     }//myNetworkingMethod
@@ -258,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
         String formattedDate = dateFormat.format(calendar.getTime());
 
         return formattedDate;
-    }
+    }//getCurrentDate
 
 
-    }// MainActivity
+}// MainActivity

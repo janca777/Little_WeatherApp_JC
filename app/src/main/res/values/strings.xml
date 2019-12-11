@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Little WeatherApp(JC)</string>
+    <string name="app_name">Little WeatherBase</string>
+    <string name="editText_label">Zeig mir das Wetter in</string>
+    <string name="editText_hint">Muenchen, augsburg, ...</string>
+    <string name="getCurrentLocationLabel">Current Location</string>
+    <string name="temperatureUnitLabel">&#176; C</string>
 </resources>
