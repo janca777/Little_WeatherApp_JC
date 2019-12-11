@@ -9,19 +9,40 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cz.msebera.android.httpclient.Header;
+
 public class MainActivity extends AppCompatActivity {
 
+    final String LOG = "WeatherAppLogTag";
+
+    //openweather api access data
+//    final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
+    final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather";
+    //my APP ID for openweather api access
+    final String APP_ID = "0b3bc0be989204273fac056cabcafeaa";
+    //select language for "description" String, DEUTSCH
+    final String LANGUAGE = "de";
+
+    //the request code we need the user's permission for
+    final int REQUEST_CODE = 123;
     //time between location updates (5000 milliseconds or 5 seconds)
     final long MIN_TIME = 5000;
     // Distance between location updates (1000m or 1km)
     final float MIN_DISTANCE = 1000;
-
-    final String LOG = "WeatherAppLogTag";
 
     //setting the location provicer for the fine location
     final String LOCATION_PROVIDER = LocationManager.GPS_PROVIDER;
@@ -78,6 +99,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG, "Longitude is: " + longitude);
                 Log.d(LOG, "Latitude is: " + latitude);
 
+                RequestParams myParams = new RequestParams();
+                myParams.put("lang", LANGUAGE);
+                myParams.put("lat", latitude);
+                myParams.put("lon", longitude);
+                myParams.put("appid", APP_ID);
+
+                Log.d(LOG, "myParams contains: " + myParams.toString());
+
+                myNetworkingMethod(myParams);
+
             }
 
             @Override
@@ -114,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
             // for Activity#requestPermissions for more details.
 
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
 
             return;
         }
@@ -126,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == 123) {
+        if (requestCode == REQUEST_CODE) {
 
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(LOG, "onRequestPermissionResult(): Permission granted!");
@@ -141,4 +172,63 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-}
+    //establishing network connection to access the json weatherdata
+    private void myNetworkingMethod(RequestParams myParams) {
+
+        AsyncHttpClient myClient = new AsyncHttpClient();
+        myClient.get(WEATHER_URL, myParams, new JsonHttpResponseHandler() {
+
+            @Override
+            public void onSuccess(int status, Header[] headers, JSONObject response) {
+
+                //logging the json response to the screan
+                Log.d(LOG, "Success! JSON: " + response.toString());
+
+                //decding the information from the json
+                processJson(response);
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
+                Log.e(LOG, e.toString());
+                Log.d(LOG, "Statuscode: " + statusCode);
+
+                Toast.makeText(MainActivity.this, "The HTTP-Request failed", Toast.LENGTH_SHORT).show();
+            }
+
+
+        });
+    }
+
+    //decoding the received json
+    private void processJson(JSONObject jsonObject) {
+        try {
+
+            //getting the city's name
+            myCity = jsonObject.getString("name");
+            Log.d(LOG, "City: " + myCity);
+            locationTextView.setText(myCity);
+
+            // accessing temperature value and converting Kelvin to Celsius
+            double myTempResult = jsonObject.getJSONObject("main").getDouble("temp") - 273.15;
+            //converting result to integer
+            int myRoundedTemp = (int) Math.rint(myTempResult);
+            Log.d(LOG, "Temperature in Celsius: " + myRoundedTemp);
+
+            tempTextView.setText(String.valueOf(myRoundedTemp));
+
+            //getting the weather's description
+            JSONArray listArray = jsonObject.getJSONArray("weather");
+            JSONObject firstObject = listArray.getJSONObject(0);
+            myWeatherDescription = firstObject.getString("description");
+
+            weatherDescritptionTextView.setText(myWeatherDescription);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+}// MainActivity
