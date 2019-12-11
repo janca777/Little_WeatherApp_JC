@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 import cz.msebera.android.httpclient.Header;
 
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         //wiring the layout elements
         dateView = findViewById(R.id.dateView);
         locationTextView = findViewById(R.id.locationTextView);
+        countryTextView = findViewById(R.id.countryTextView);
         tempTextView = findViewById(R.id.tempTextView);
         weatherDescritptionTextView = findViewById(R.id.weatherDescriptionTextView);
         editCityField = findViewById(R.id.editCityName);
@@ -273,8 +275,11 @@ public class MainActivity extends AppCompatActivity {
             JSONArray listArray = jsonObject.getJSONArray("weather");
             JSONObject firstObject = listArray.getJSONObject(0);
             myWeatherDescription = firstObject.getString("description");
-
             weatherDescritptionTextView.setText(myWeatherDescription);
+
+            //extracting the country of the location
+            myCountry = jsonObject.getJSONObject("sys").getString("country");
+            countryTextView.setText(", " + myCountry);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -286,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
     private String getCurrentDate() {
 
         Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd. MMMM", Locale.GERMAN);
         String formattedDate = dateFormat.format(calendar.getTime());
 
         return formattedDate;
