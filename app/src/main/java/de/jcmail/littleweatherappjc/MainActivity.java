@@ -27,6 +27,10 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
 
+    //**********
+    // variables
+    // ********/
+
     final String LOG = "WeatherAppLogTag";
 
     //openweather api access data
@@ -60,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
     private String myCity;
     private String myWeatherDescription;
 
+    //**********
+    // Android lifecicle callback methods
+    // ********/
+
     //setting up the app in oncreate() callback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
         tempTextView = findViewById(R.id.tempTextView);
         weatherDescritptionTextView = findViewById(R.id.weatherDescriptionTextView);
 
-
     }
 
     //getting device location in onResume() callback
@@ -84,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
 
         getWeatherForLocation();
     }
+
+    //****
+    // Custom methods
+    // **/
 
     private void getWeatherForLocation() {
 
@@ -108,8 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG, "myParams contains: " + myParams.toString());
 
                 myNetworkingMethod(myParams);
-
-            }
+            }// onLocationChanged
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -126,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d(LOG, "onProviderDisabled() callback received");
             }
-        };
+        };//getWeatherForLocation
 
         //setting up the location manager
         myLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -154,7 +164,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
         if (requestCode == REQUEST_CODE) {
@@ -168,9 +179,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
 
-        }
+        }//outer if-statement
 
-    }
+    }//onRequestPermissionsResult
 
     //establishing network connection to access the json weatherdata
     private void myNetworkingMethod(RequestParams myParams) {
@@ -186,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //decding the information from the json
                 processJson(response);
-            }
+            }//onSuccess
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
@@ -194,11 +205,11 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG, "Statuscode: " + statusCode);
 
                 Toast.makeText(MainActivity.this, "The HTTP-Request failed", Toast.LENGTH_SHORT).show();
-            }
+            }//onFailure
 
 
-        });
-    }
+        });//myClient.get
+    }//myNetworkingMethod
 
     //decoding the received json
     private void processJson(JSONObject jsonObject) {
@@ -228,7 +239,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-    }
+    }//processJson
+
+
 
 
 }// MainActivity
