@@ -8,6 +8,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,6 +25,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     //**********
     // variables
     // ********/
-
     final String LOG = "WeatherAppLogTag";
 
     //openweather api access data
@@ -58,10 +62,12 @@ public class MainActivity extends AppCompatActivity {
     private TextView locationTextView;
     private TextView tempTextView;
     private TextView weatherDescritptionTextView;
+    private TextView countryTextView;
+    private EditText editCityField;
+    private Button getCurrentLocationBtn;
 
-
-    private String myTemperature;
     private String myCity;
+    private String myCountry;
     private String myWeatherDescription;
 
     //**********
@@ -79,6 +85,12 @@ public class MainActivity extends AppCompatActivity {
         locationTextView = findViewById(R.id.locationTextView);
         tempTextView = findViewById(R.id.tempTextView);
         weatherDescritptionTextView = findViewById(R.id.weatherDescriptionTextView);
+
+        editCityField = findViewById(R.id.editCityName);
+          getCurrentLocationBtn = findViewById(R.id.getCurrentLocationBtn);
+
+        //update the date
+        dateView.setText(getCurrentDate());
 
     }
 
@@ -178,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(LOG, "Permission DENIED!");
             }
 
-
         }//outer if-statement
 
     }//onRequestPermissionsResult
@@ -188,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
 
         AsyncHttpClient myClient = new AsyncHttpClient();
         myClient.get(WEATHER_URL, myParams, new JsonHttpResponseHandler() {
-
             @Override
             public void onSuccess(int status, Header[] headers, JSONObject response) {
 
@@ -214,7 +224,6 @@ public class MainActivity extends AppCompatActivity {
     //decoding the received json
     private void processJson(JSONObject jsonObject) {
         try {
-
             //getting the city's name
             myCity = jsonObject.getString("name");
             Log.d(LOG, "City: " + myCity);
@@ -241,7 +250,15 @@ public class MainActivity extends AppCompatActivity {
 
     }//processJson
 
+    //getting the current date from the system and formatting it
+    private String getCurrentDate() {
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM dd");
+        String formattedDate = dateFormat.format(calendar.getTime());
+
+        return formattedDate;
+    }
 
 
-
-}// MainActivity
+    }// MainActivity
