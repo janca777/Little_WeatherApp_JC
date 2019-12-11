@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Little WeatherBase</string>
     <string name="editText_label">Zeig mir das Wetter in</string>
-    <string name="editText_hint">Muenchen, paris, ...</string>
-    <string name="getCurrentLocationLabel">Current Location</string>
+    <string name="editText_hint">Muenchen... paris,us...</string>
+    <string name="getCurrentLocationLabel">Mein Standort</string>
     <string name="temperatureUnitLabel">&#176; C</string>
 </resources>

@@ -77,6 +77,16 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
+        android:id="@+id/clearEditText"
+        android:layout_width="35dp"
+        android:layout_height="33dp"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginBottom="52dp"
+        android:background="@android:drawable/ic_menu_close_clear_cancel"
+        app:layout_constraintBottom_toTopOf="@+id/getCurrentLocationBtn"
+        app:layout_constraintStart_toEndOf="@+id/editCityName" />
+
+    <Button
         android:id="@+id/getCurrentLocationBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

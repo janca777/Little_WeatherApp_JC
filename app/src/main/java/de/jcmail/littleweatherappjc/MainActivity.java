@@ -10,6 +10,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,12 +38,11 @@ import cz.msebera.android.httpclient.Header;
 public class MainActivity extends AppCompatActivity {
 
     //**********
-    // variables
+    // Field variables
     // ********/
     final String LOG = "WeatherAppLogTag";
 
     //openweather api access data
-//    final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather?q=";
     final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather";
     //my APP ID for openweather api access
     final String APP_ID = "0b3bc0be989204273fac056cabcafeaa";
@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView weatherDescritptionTextView;
     private TextView countryTextView;
     private EditText editCityField;
+    private Button clearEditText;
     private Button getCurrentLocationBtn;
 
     private String myCity;
@@ -91,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         tempTextView = findViewById(R.id.tempTextView);
         weatherDescritptionTextView = findViewById(R.id.weatherDescriptionTextView);
         editCityField = findViewById(R.id.editCityName);
+        clearEditText = findViewById(R.id.clearEditText);
         getCurrentLocationBtn = findViewById(R.id.getCurrentLocationBtn);
 
         //getting the current date and updating the textfield
@@ -110,30 +112,53 @@ public class MainActivity extends AppCompatActivity {
                     getWeatherForLocation();
                 }
 
-                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+                InputMethodManager myInputMedthodMangr = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                myInputMedthodMangr.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
                 return false;
             }
         });//setOnEditorActionListener
 
+        //wiring the clear button behind the editText
+        View.OnClickListener clearTextClicklistener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                editCityField.setText("");
+            }
+        };//clearTextClicklistener
 
-    }
+        //wiring the "get current location" button
+        View.OnClickListener getLocationClicklistener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWeatherForLocation();
+                //clearing the edit Textfield after the location has changes
+                editCityField.setText("");
+            }
+        };//getLocationClicklistener
+
+        //setting the listeners for the functionality of the buttons
+        clearEditText.setOnClickListener(clearTextClicklistener);
+        getCurrentLocationBtn.setOnClickListener(getLocationClicklistener);
+
+    }//onCreate callback
 
     //getting device location in onResume() callback
     @Override
     protected void onResume() {
         super.onResume();
+
         Log.d(LOG, "onResume() callback called");
         Log.d(LOG, "Getting the weather from the location");
 
         getWeatherForLocation();
-    }
+    }//onResume callback
 
     //****
     // Custom methods
     // **/
 
+    //getting the device's location, and displaying the local weather
     private void getWeatherForLocation() {
 
         myLocationListener = new LocationListener() {
@@ -159,10 +184,12 @@ public class MainActivity extends AppCompatActivity {
             }// onLocationChanged
 
             @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {}
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
 
             @Override
-            public void onProviderEnabled(String provider) {}
+            public void onProviderEnabled(String provider) {
+            }
 
             @Override
             public void onProviderDisabled(String provider) {
@@ -178,13 +205,6 @@ public class MainActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission
                 (this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    Activity#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for Activity#requestPermissions for more details.
 
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
@@ -235,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
         myClient.get(WEATHER_URL, myParams, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int status, Header[] headers, JSONObject response) {
-
                 //logging the json response to the screan
                 Log.d(LOG, "Success! JSON: " + response.toString());
 
@@ -289,13 +308,11 @@ public class MainActivity extends AppCompatActivity {
 
     //getting the current date from the system and formatting it
     private String getCurrentDate() {
-
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd. MMMM", Locale.GERMAN);
         String formattedDate = dateFormat.format(calendar.getTime());
 
         return formattedDate;
     }//getCurrentDate
-
 
 }// MainActivity
