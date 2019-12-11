@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     final String WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather";
     //my APP ID for openweather api access
     final String APP_ID = "0b3bc0be989204273fac056cabcafeaa";
-    //select language for "description" String, DEUTSCH
+    //select language for "description"-String: DEUTSCH
     final String LANGUAGE = "de";
 
     //the request code we need the user's permission for
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 myInputMedthodMangr.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
                 return false;
-            }
+            }//onEditorAction override
         });//setOnEditorActionListener
 
         //wiring the clear button behind the editText
@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 editCityField.setText("");
-            }
+            }//onClick override
         };//clearTextClicklistener
 
         //wiring the "get current location" button
@@ -133,22 +133,28 @@ public class MainActivity extends AppCompatActivity {
                 getWeatherForLocation();
                 //clearing the edit Textfield after the location has changes
                 editCityField.setText("");
-            }
+            }//onClick override
         };//getLocationClicklistener
 
         //setting the listeners for the functionality of the buttons
         clearEditText.setOnClickListener(clearTextClicklistener);
         getCurrentLocationBtn.setOnClickListener(getLocationClicklistener);
-
     }//onCreate callback
 
     //getting device location in onResume() callback
     @Override
     protected void onResume() {
         super.onResume();
-
         getWeatherForLocation();
     }//onResume callback
+
+    //resource maintenance - removing updated from the LocationManager
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (myLocationManager != null) myLocationManager.removeUpdates(myLocationListener);
+    }//onPause callback
 
     //****
     // Custom methods
@@ -172,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 myParams.put("appid", APP_ID);
 
                 myNetworkingMethod(myParams);
-            }// onLocationChanged
+            }//onLocationChanged override
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
@@ -185,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProviderDisabled(String provider) {
                 Log.d(LOG, "onProviderDisabled() callback received");
-            }
+            }//onProviderDisabled override
         };//LocationListener
 
         //setting up the location manager
@@ -202,7 +208,8 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
-        myLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME, MIN_DISTANCE, myLocationListener);
+        myLocationManager.requestLocationUpdates(LOCATION_PROVIDER, MIN_TIME,
+                MIN_DISTANCE, myLocationListener);
 
     }//getWeatherForLocation
 
@@ -215,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
         myParams.put("appid", APP_ID);
 
         myNetworkingMethod(myParams);
-
     }//getWeatherForNewCity
 
     //get the user"s permission to acces the location data
@@ -233,10 +239,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 Log.d(LOG, "Permission DENIED!");
             }
-
         }//outer if-statement
-
-    }//onRequestPermissionsResult
+    }//onRequestPermissionsResult override
 
     //establishing network connection to access the json weatherdata
     private void myNetworkingMethod(RequestParams myParams) {
@@ -247,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
             public void onSuccess(int status, Header[] headers, JSONObject response) {
 
                 processJson(response);
-            }//onSuccess
+            }//onSuccess override
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable e, JSONObject response) {
@@ -256,8 +260,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //displaying an error toast when no network connection is available
                 Toast.makeText(MainActivity.this, "The HTTP-Request failed", Toast.LENGTH_SHORT).show();
-            }//onFailure
-
+            }//onFailure override
         });//myClient.get
     }//myNetworkingMethod
 
@@ -283,11 +286,9 @@ public class MainActivity extends AppCompatActivity {
             //extracting the country of the location
             myCountry = jsonObject.getJSONObject("sys").getString("country");
             countryTextView.setText(", " + myCountry);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }//processJson
 
     //getting the current date from the system and formatting it
@@ -298,5 +299,4 @@ public class MainActivity extends AppCompatActivity {
 
         return formattedDate;
     }//getCurrentDate
-
 }// MainActivity
